@@ -1,8 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { productService } from "../service/product.service";
 import type { IProduct } from "../types/products";
+import { bodyParser } from "../utils/parseBody";
 
-const productController = (req: IncomingMessage, res: ServerResponse) => {
+const productController = async (req: IncomingMessage, res: ServerResponse) => {
   // /product -> GET,POST,PUT
   const url = req.url;
   const method = req.method;
@@ -25,7 +26,7 @@ const productController = (req: IncomingMessage, res: ServerResponse) => {
     );
   } else if (method === "GET" && id !== null) {
     const products = productService();
-    const product= products.find((p:IProduct)=> p.id ===id);
+    const product = products.find((p: IProduct) => p.id === id);
 
     res.writeHead(200, { "content-type": "application/json" });
     res.end(
@@ -35,6 +36,20 @@ const productController = (req: IncomingMessage, res: ServerResponse) => {
       }),
     );
   }
+
+  else if (method === "POST"  && url === "/products") {
+    const body= await bodyParser(req);
+
+    res.writeHead(201, { "content-type": "application/json" });
+    res.end(
+      JSON.stringify({
+        message: "Products create successfully",
+      }),
+    );
+  }
+
+  
+
 };
 
 export default productController;
