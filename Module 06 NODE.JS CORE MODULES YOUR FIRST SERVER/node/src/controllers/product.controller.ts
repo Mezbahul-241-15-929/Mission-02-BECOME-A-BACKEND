@@ -24,24 +24,24 @@ const productController = async (req: IncomingMessage, res: ServerResponse) => {
         data: products,
       }),
     );
-  } 
+  }
 
-  else if (method === "POST"  && url === "/products") {
-    const body= await bodyParser(req);
+  // Post Method:
+  else if (method === "POST" && url === "/products") {
+    const body = await bodyParser(req);
     // console.log(body);
-    const newProduct={
+    const newProduct = {
       id: Date.now(),
       ...body,
-    }
+    };
 
     console.log(newProduct);
 
-        const products = productService();
+    const products = productService();
 
-        products.push(newProduct);
+    products.push(newProduct);
 
-        createProduct(products);
-
+    createProduct(products);
 
     res.writeHead(201, { "content-type": "application/json" });
     res.end(
@@ -52,8 +52,34 @@ const productController = async (req: IncomingMessage, res: ServerResponse) => {
     );
   }
 
-  
+  // Put Method:
+  else if (method === "PUT" && url !== null) {
+    const body = await bodyParser(req);
+    // console.log(body);
+    const products = productService();
 
+    const index = products.findIndex((p: IProduct) => p.id === id);
+    // console.log(index);
+    if (index < 0) {
+      res.writeHead(404, { "content-type": "application/json" });
+      res.end(
+        JSON.stringify({
+          message: "not found",
+          // data: newProduct,
+        }),
+      );
+    }
+    // console.log(products[index]);
+    products[index]={id: products[index].id, ...body};
+    createProduct(products);
+
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(
+      JSON.stringify({
+        message: "Products update successfully",
+      }),
+    );
+  }
 };
 
 export default productController;
